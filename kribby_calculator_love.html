@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>For Kribby ❤️</title>
+  <style>
+    :root{
+      --bg1:#0b0b14;
+      --bg2:#1a1033;
+      --card: rgba(255,255,255,.08);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.65);
+      --btn:#ffffff;
+      --btnText:#121218;
+      --good:#33ff99;
+      --bad:#ff4d6d;
+    }
+    *{box-sizing:border-box; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Arial, sans-serif;}
+    body{
+      margin:0;
+      min-height:100vh;
+      color:var(--text);
+      background: radial-gradient(1200px 600px at 20% 10%, #2a1762 0%, transparent 55%),
+                  radial-gradient(900px 500px at 80% 30%, #4b1b68 0%, transparent 55%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+    .wrap{
+      min-height:100vh;
+      padding: 24px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .card{
+      width:min(520px, 100%);
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    h1{margin:0 0 8px; font-size: 24px;}
+    p{margin:0 0 14px; color:var(--muted); line-height:1.5;}
+    .row{display:flex; gap:12px; flex-wrap:wrap; align-items:center;}
+    .btn{
+      padding: 12px 16px;
+      border-radius: 14px;
+      border: none;
+      cursor:pointer;
+      background: var(--btn);
+      color: var(--btnText);
+      font-weight:700;
+      transition: transform .08s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active{transform: scale(.98);}
+    .btn.secondary{
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.25);
+      color: var(--text);
+      font-weight:600;
+    }
+    .screen{
+      display:none;
+      animation: fade .25s ease;
+    }
+    .screen.active{display:block;}
+    @keyframes fade { from{opacity:0; transform: translateY(10px);} to{opacity:1; transform:none;} }
+
+    /* Calculator */
+    .calc{
+      display:grid;
+      gap:10px;
+      margin-top:12px;
+    }
+    .display{
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      padding: 14px 14px;
+      font-size: 22px;
+      letter-spacing: .4px;
+      text-align:right;
+      min-height:56px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      overflow:hidden;
+      word-break: break-all;
+    }
+    .keys{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:10px;
+    }
+    .key{
+      padding: 14px 0;
+      border-radius: 16px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.14);
+      color: var(--text);
+      font-size: 18px;
+      font-weight:700;
+      cursor:pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .key.op{background: rgba(255,255,255,.14);}
+    .key.eq{background: #ffffff; color:#121218;}
+    .key.danger{background: rgba(255,77,109,.22); border-color: rgba(255,77,109,.35);}
+    .hint{
+      margin-top:10px;
+      font-size: 13px;
+      color: rgba(255,255,255,.7);
+    }
+    .status{
+      margin-top:8px;
+      font-size: 14px;
+      font-weight:700;
+    }
+    .good{color: var(--good);}
+    .bad{color: var(--bad);}
+
+    /* Typewriter */
+    .typebox{
+      margin-top:14px;
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      padding: 16px;
+      line-height:1.6;
+      font-size: 16px;
+      min-height: 150px;
+      position:relative;
+      overflow:hidden;
+    }
+    .caret{
+      display:inline-block;
+      width:10px;
+      margin-left:2px;
+      border-bottom: 2px solid rgba(255,255,255,.75);
+      animation: blink .8s infinite;
+      transform: translateY(-2px);
+    }
+    @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+    .hidden{display:none;}
+    .divider{
+      height:1px; background: rgba(255,255,255,.12); margin: 14px 0;
+    }
+
+    /* Funny shake */
+    .shake{
+      animation: shake .35s ease;
+    }
+    @keyframes shake{
+      0%{transform: translateX(0)}
+      25%{transform: translateX(-7px)}
+      50%{transform: translateX(7px)}
+      75%{transform: translateX(-4px)}
+      100%{transform: translateX(0)}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+
+      <!-- SCREEN 1: CALCULATOR -->
+      <section class="screen active" id="screen-calc">
+        <h1>Calculator 🔐</h1>
+        <p>Type the correct expression to unlock next page.</p>
+
+        <div class="calc">
+          <div class="display" id="display">0</div>
+
+          <div class="keys">
+            <button class="key" data-k="7">7</button>
+            <button class="key" data-k="8">8</button>
+            <button class="key" data-k="9">9</button>
+            <button class="key op" data-k="+">+</button>
+
+            <button class="key" data-k="4">4</button>
+            <button class="key" data-k="5">5</button>
+            <button class="key" data-k="6">6</button>
+            <button class="key op" data-k="-">-</button>
+
+            <button class="key" data-k="1">1</button>
+            <button class="key" data-k="2">2</button>
+            <button class="key" data-k="3">3</button>
+            <button class="key op" data-k="*">×</button>
+
+            <button class="key danger" data-k="C">C</button>
+            <button class="key" data-k="0">0</button>
+            <button class="key eq" data-k="=">=</button>
+            <button class="key op" data-k="/">÷</button>
+          </div>
+        </div>
+
+        <div class="hint">
+          ✅ Unlock condition: Expression must be <b>1+4+3</b> and answer must be <b>8</b>.
+        </div>
+        <div class="status" id="calc-status"></div>
+      </section>
+
+      <!-- SCREEN 2: TYPEWRITER -->
+      <section class="screen" id="screen-type">
+        <h1>💌 Message</h1>
+        <p>Read slowly…</p>
+
+        <div class="typebox">
+          <span id="type-text"></span><span class="caret" id="caret"></span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <button class="btn" id="btn-next-1" disabled>Next ➜</button>
+          <button class="btn secondary" id="btn-retype">Replay typing</button>
+        </div>
+      </section>
+
+      <!-- SCREEN 3: DEEP OPTIONS -->
+      <section class="screen" id="screen-deep">
+        <h1>✨ Next Option</h1>
+        <p>Do you want to know thought about deep and how much deep loves you?</p>
+
+        <div class="row">
+          <button class="btn" id="btn-show-deep">Yes, show 💖</button>
+          <button class="btn secondary" id="btn-skip-deep">Skip</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="typebox hidden" id="deep-msg-box">
+          <div id="deep-msg" style="white-space:pre-wrap;"></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <button class="btn" id="btn-next-2" disabled>Next ➜</button>
+        </div>
+      </section>
+
+      <!-- SCREEN 4: QUESTION -->
+      <section class="screen" id="screen-q">
+        <h1>😏 Question</h1>
+        <p><b>tum itna sundar q ho kriii ?</b></p>
+
+        <div class="row" style="margin-top:14px;">
+          <button class="btn" id="btn-haan">Haan hu 😌</button>
+          <button class="btn secondary" id="btn-nahi">nahi hu 😤</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <p class="status" id="q-status"></p>
+
+        <div class="divider"></div>
+        <div class="row">
+          <button class="btn hidden" id="btn-final">Finish 💗</button>
+        </div>
+      </section>
+
+      <!-- SCREEN 5: FINAL -->
+      <section class="screen" id="screen-final">
+        <h1>🥹</h1>
+        <p style="font-size:18px; color: rgba(255,255,255,.92); line-height:1.6;">
+          Haan maangyi tum itna sundar ho 💖
+        </p>
+        <div class="divider"></div>
+        <p class="hint">Made with love ❤️</p>
+      </section>
+
+    </div>
+  </div>
+
+  <script>
+    // --- Helpers ---
+    const $ = (id) => document.getElementById(id);
+    const show = (screenId) => {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      $(screenId).classList.add("active");
+      window.scrollTo(0,0);
+    };
+
+    // --- Calculator logic ---
+    let expr = "";
+    const display = $("display");
+    const status = $("calc-status");
+
+    const normalize = (s) => s.replace(/\\s+/g,'').trim();
+
+    const safeEval = (s) => {
+      // allow only digits + operators + dot
+      if (!/^[0-9+\\-*/.() ]+$/.test(s)) return null;
+      try {
+        const val = Function("return (" + s + ")")();
+        if (typeof val !== "number" || !isFinite(val)) return null;
+        return val;
+      } catch (e) {
+        return null;
+      }
+    };
+
+    const render = () => {
+      display.textContent = expr.length ? expr : "0";
+    };
+
+    const setStatus = (msg, cls) => {
+      status.textContent = msg;
+      status.className = "status " + (cls || "");
+    };
+
+    const unlockCheck = () => {
+      // Only open if exact expression 1+4+3
+      const cleaned = normalize(expr);
+      const val = safeEval(cleaned);
+
+      if (cleaned === "1+4+3" && val === 8) {
+        setStatus("Unlocked ✅ Opening…", "good");
+        setTimeout(() => {
+          show("screen-type");
+          startTyping();
+        }, 550);
+      } else {
+        setStatus("Wrong ❌ Try again.", "bad");
+      }
+    };
+
+    document.querySelectorAll(".key").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const k = btn.getAttribute("data-k");
+        if (k === "C") {
+          expr = "";
+          setStatus("", "");
+          render();
+          return;
+        }
+        if (k === "=") {
+          unlockCheck();
+          return;
+        }
+        // if display is 0 and number pressed
+        if (expr === "0") expr = "";
+        expr += k;
+        setStatus("", "");
+        render();
+      });
+    });
+
+    // --- Typewriter ---
+    const typeTarget = $("type-text");
+    const caret = $("caret");
+    const btnNext1 = $("btn-next-1");
+    const btnReplay = $("btn-retype");
+
+    const typeMessage =
+      "hey kribby, I love you so much bby , please don't leave me , I would definitely be your best best best partner ever after these snow";
+
+    let typingTimer = null;
+
+    function startTyping(){
+      clearInterval(typingTimer);
+      typeTarget.textContent = "";
+      btnNext1.disabled = true;
+      caret.classList.remove("hidden");
+
+      let i = 0;
+      typingTimer = setInterval(() => {
+        typeTarget.textContent += typeMessage[i];
+        i++;
+        if (i >= typeMessage.length) {
+          clearInterval(typingTimer);
+          caret.classList.add("hidden");
+          btnNext1.disabled = false;
+        }
+      }, 35);
+    }
+
+    btnNext1.addEventListener("click", () => show("screen-deep"));
+    btnReplay.addEventListener("click", startTyping);
+
+    // --- Deep message page ---
+    const btnShowDeep = $("btn-show-deep");
+    const btnSkipDeep = $("btn-skip-deep");
+    const deepBox = $("deep-msg-box");
+    const deepMsg = $("deep-msg");
+    const btnNext2 = $("btn-next-2");
+
+    const deepMessage = `Hi I am deep, if you ask how much I love you
+My dear pretty girl
+
+I know It's so easy to love someone when things are perfect and everything's wonderful. But to love someone when things are difficult, when they're not being perfect, when they're messing up, flaws are seen, mistakes are made, I think that's what really allows you to see how much love really is there.
+
+Anyone can love someone who's doing and saying all the right things, being everything you want and need, but to love someone at their lowest, to love someone despite how broken they feel, when they're lost, when you're willing to stand by them no matter how challenging or difficult things may be, I think that kind of love is a lot more beautiful. Thank you for loving me both times, when things are good and also when things are bad, for taking in every part of me, accepting my flaws, forgiving me, helping me become the best version of myself. I'm truly grateful to have you my love and I'm blessed to be yours. I love you, every version of you, in all the good and bad days, you're my girlfriend, my wifey to be, you always have me, there's no letting go. Nuh uhhh.
+
+Mwaahh bacha`;
+
+    btnShowDeep.addEventListener("click", () => {
+      deepBox.classList.remove("hidden");
+      deepMsg.textContent = deepMessage;
+      btnNext2.disabled = false;
+    });
+
+    btnSkipDeep.addEventListener("click", () => {
+      deepBox.classList.add("hidden");
+      deepMsg.textContent = "";
+      btnNext2.disabled = false;
+    });
+
+    btnNext2.addEventListener("click", () => show("screen-q"));
+
+    // --- Question page ---
+    const btnHaan = $("btn-haan");
+    const btnNahi = $("btn-nahi");
+    const qStatus = $("q-status");
+    const btnFinal = $("btn-final");
+    let nahiCount = 0;
+
+    const nahiLines = [
+      "Acha? 😤",
+      "Sach me nahi hu? 😒",
+      "Jhoot bol rhi ho 😭",
+      "Nahi nahi... tum toh sundar ho 😌",
+      "Last chance: Haan hu dabao 😌💖"
+    ];
+
+    btnNahi.addEventListener("click", () => {
+      nahiCount++;
+      const line = nahiLines[Math.min(nahiCount-1, nahiLines.length-1)];
+      qStatus.textContent = line;
+
+      const card = document.querySelector(".card");
+      card.classList.remove("shake");
+      void card.offsetWidth;
+      card.classList.add("shake");
+    });
+
+    btnHaan.addEventListener("click", () => {
+      qStatus.textContent = "Haan maangyi ✅";
+      btnFinal.classList.remove("hidden");
+    });
+
+    btnFinal.addEventListener("click", () => show("screen-final"));
+  </script>
+</body>
+</html>
